@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "onemanager": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "ONEMANAGER_API_URL": "http://localhost:8000/api",
+        "ONEMANAGER_AUTH_TOKEN": ""
+      }
+    }
+  }
+}
