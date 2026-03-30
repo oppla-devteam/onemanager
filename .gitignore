@@ -48,3 +48,14 @@ yarn-error.log*
 
 # API Reference (private)
 api_ref/
+# File con dati sensibili - NON committare
+backend/real_clients_export*.json
+backend/partners_data.json
+backend/restaurants_data.json
+backend/storage/clients_import.csv
+backend/stripe_report_tab.txt
+.github/scriptHoliday.py
+backend/.env
+frontend/.env
+.env
+*.local
