@@ -10,10 +10,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
 COPY . .
+
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN php artisan config:cache && php artisan route:cache && php artisan view:cache || true
 
