@@ -6,28 +6,22 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
     {
-        if (DB::getDriverName() === 'sqlite') {
-            return;
+            public function up(): void
+        {
+                    $driver = DB::getDriverName();
+                    if ($driver === 'sqlite' || $driver === 'pgsql') {
+                                    return;
+                    }
+                    DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('bozza', 'emessa', 'inviata', 'verificata', 'pagata', 'stornata') DEFAULT 'bozza'");
         }
 
-        DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('bozza', 'emessa', 'inviata', 'verificata', 'pagata', 'stornata') DEFAULT 'bozza'");
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        if (DB::getDriverName() === 'sqlite') {
-            return;
+        public function down(): void
+        {
+                    $driver = DB::getDriverName();
+                    if ($driver === 'sqlite' || $driver === 'pgsql') {
+                                    return;
+                    }
+                    DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('bozza', 'emessa', 'inviata', 'pagata', 'stornata') DEFAULT 'bozza'");
         }
-
-        DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('bozza', 'emessa', 'inviata', 'pagata', 'stornata') DEFAULT 'bozza'");
-    }
-};
+    };
