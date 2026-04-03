@@ -23,7 +23,6 @@ import Menus from './pages/Menus'
 import DeliveryZones from './pages/DeliveryZones'
 import PartnerProtection from './pages/PartnerProtection'
 import Login from './pages/Login'
-import BinkCallback from './pages/BinkCallback'
 
 function applyTheme() {
   const theme = localStorage.getItem('theme') || 'system'
@@ -55,7 +54,6 @@ function App() {
       >
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/bink/callback" element={<BinkCallback />} />
           <Route path="/sign/:token" element={<ContractSignature />} />
           <Route path="/" element={
             <PrivateRoute>

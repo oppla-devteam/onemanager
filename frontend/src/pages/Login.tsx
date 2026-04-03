@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion'
-import { AlertCircle, ExternalLink } from 'lucide-react'
+import { AlertCircle, LogIn, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 
-const BINK_CLIENT_ID = import.meta.env.VITE_BINK_CLIENT_ID || 'your_bink_client_id'
-
 export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { isAuthenticated } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -20,19 +21,21 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate, from])
 
-  // Check for error from callback
-  useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const errorMsg = params.get('error')
-    if (errorMsg) {
-      setError(decodeURIComponent(errorMsg))
-    }
-  }, [location.search])
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-  const handleBinkLogin = () => {
-    const redirectUri = `${window.location.origin}/auth/bink/callback`
-    const authUrl = `https://binatomy.link/api/oauth/authorize?client_id=${BINK_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`
-    window.location.href = authUrl
+    try {
+      const success = await login(email, password)
+      if (!success) {
+        setError('Email o password non corretti.')
+      }
+    } catch (err) {
+      setError('Errore di connessione al server.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -61,7 +64,7 @@ export default function Login() {
         <div className="glass-card p-8">
           <div className="text-center mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Accedi</h2>
-            <p className="text-gray-500 text-sm mt-1">Usa il tuo account Bink per accedere</p>
+            <p className="text-gray-500 text-sm mt-1">Inserisci le tue credenziali per accedere</p>
           </div>
 
           {error && (
@@ -71,15 +74,55 @@ export default function Login() {
             </div>
           )}
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleBinkLogin}
-            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-all shadow-sm"
-          >
-            <ExternalLink className="w-5 h-5" />
-            Accedi con Bink
-          </motion.button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                autoFocus
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-gray-900 bg-white"
+                placeholder="email@esempio.com"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-gray-900 bg-white"
+                placeholder="La tua password"
+              />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white rounded-lg font-medium transition-all shadow-sm"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <LogIn className="w-5 h-5" />
+              )}
+              {loading ? 'Accesso in corso...' : 'Accedi'}
+            </motion.button>
+          </form>
         </div>
 
         {/* Info */}
