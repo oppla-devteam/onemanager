@@ -27,10 +27,34 @@ WORKDIR /app
 
 COPY backend/ .
 
+# Rewrite web.php to serve React SPA for all routes
+RUN cat > routes/web.php << 'WEBPHP'
+<?php
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
+Route::get('/contracts/sign/{token}', function ($token) {
+    return view('contracts.signature-page');
+})->name('contracts.sign');
+Route::get('/contracts/signed-success', function () {
+    return view('contracts.signed-success');
+})->name('contracts.signed-success');
+Route::get('/contracts/declined', function () {
+    return view('contracts.declined');
+})->name('contracts.declined');
+Route::get('/{any}', function () {
+    $spaPath = public_path('spa/index.html');
+    if (File::exists($spaPath)) {
+        return response()->file($spaPath);
+    }
+    abort(404, 'Frontend not found');
+})->where('any', '.*');
+WEBPHP
+
 RUN npm ci && npm run build && rm -rf node_modules
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Copy frontend build output into backend public/spa folder
 COPY --from=frontend-builder /frontend/dist /app/public/spa
 
 RUN chmod -R 775 /app/storage /app/bootstrap/cache 2>/dev/null || true
