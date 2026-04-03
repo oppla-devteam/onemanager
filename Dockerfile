@@ -34,9 +34,9 @@ Route::get('/contracts/declined', function () {
     return view('contracts.declined');
 })->name('contracts.declined');
 Route::get('/{any}', function () {
-    \$spaPath = public_path('spa/index.html');
-    if (File::exists(\$spaPath)) {
-        return response()->file(\$spaPath);
+    $spaPath = public_path('spa/index.html');
+    if (File::exists($spaPath)) {
+        return response()->file($spaPath);
     }
     abort(404, 'Frontend not found');
 })->where('any', '.*');
